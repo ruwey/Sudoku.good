@@ -1,6 +1,4 @@
-import java.util.Arrays;
-import java.util.Random;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Board {
     int[][] correct_board = new int[9][9];
@@ -15,16 +13,7 @@ public class Board {
         Random r = new Random();
         for (int row = 0; row < correct_board.length; row++) {
             ArrayList<Integer> nums = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)); // she can't count ha
-            for (int column = 0; column < correct_board[row].length; column++) {
-                while (correct_board[row][column] == 0) {
-                    int num = nums.get(r.nextInt(nums.size()));
-                    System.out.println(this);
-                    if (check_column(column, num) && check_box(row, column, num)) {
-                        correct_board[row][column] = num;
-                        nums.remove((Integer)num);
-                    }
-                }
-            }
+            new_cell(0, 0, nums, r);
         }
     }
 
@@ -59,7 +48,27 @@ public class Board {
             }
         return true;
     }
-    public boolean new_cell(int row, int column, ArrayList<Integer> posiblities) {
-        return true;
+    private boolean new_cell(int row, int column, ArrayList<Integer> possibilities, Random r) {
+        Collections.shuffle(possibilities);
+        for (int num: possibilities) {
+            System.out.println(row + ", " + column);
+            System.out.println(this);
+            if (check_column(column, num) && check_box(row, column, num)) {
+                correct_board[row][column] = num;
+                possibilities.remove((Integer) num);
+                if (row == 8) {
+                    column++;
+                    row = 0;
+                    ArrayList<Integer> pos = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+                }
+                else if (row == 8 && column ==8)
+                    return true;
+                else
+                    row++;
+                boolean ret = new_cell(row, column, possibilities, r);
+                if (ret) return true;
+            }
+        }
+        return false;
     }
 }
