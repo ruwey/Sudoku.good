@@ -12,8 +12,8 @@ public class Board {
     public Board() {
         Random r = new Random();
         for (int row = 0; row < correct_board.length; row++) {
-            ArrayList<Integer> nums = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9)); // she can't count ha
-            new_cell(0, 0, nums, r);
+            int[] nums = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+            new_row(0, 0, nums, r);
         }
     }
 
@@ -48,27 +48,27 @@ public class Board {
             }
         return true;
     }
-    private boolean new_cell(int row, int column, ArrayList<Integer> possibilities, Random r) {
-        Collections.shuffle(possibilities);
-        for (int num: possibilities) {
+    private boolean new_row(int row, int column, Random r) {
+        int[] pos = (int[]) Collections.shuffle();
+        for (int num: pos) {
             System.out.println(row + ", " + column);
             System.out.println(this);
             if (check_column(column, num) && check_box(row, column, num)) {
                 correct_board[row][column] = num;
-                possibilities.remove((Integer) num);
-                if (row == 8) {
-                    column++;
-                    row = 0;
-                    ArrayList<Integer> pos = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
-                }
-                else if (row == 8 && column ==8)
+                if (row == 8 && column == 8)
                     return true;
-                else
+                else if (column == 8) {
                     row++;
-                boolean ret = new_cell(row, column, possibilities, r);
+                    column = 0;
+                    pos = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+                }
+                else
+                    column++;
+                boolean ret = new_row(row, column, pos, r);
                 if (ret) return true;
             }
         }
+        System.out.println("Backtracking");
         return false;
     }
 }
