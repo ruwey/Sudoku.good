@@ -11,9 +11,7 @@ public class Board {
      */
     public Board() {
         Random r = new Random();
-        for (int row = 0; row < correct_board.length; row++) {
-            new_cell(0, 0, r);
-        }
+        new_cell(0, 0, r);
     }
 
     public String toString() {
@@ -56,8 +54,6 @@ public class Board {
     private boolean new_cell(int row, int column, Random r) {
         List<Integer> pos = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
         Collections.shuffle(pos);
-        System.out.println(row + ", " + column);
-        System.out.println(this);
         for (int num: pos) {
             if (check_column(column, num) && check_box(row, column, num) && check_row(row, num)) {
                 correct_board[row][column] = num;
@@ -69,12 +65,11 @@ public class Board {
                 }
                 else
                     column++;
-                boolean ret = new_cell(row, column, r);
-                if (ret) return true;
+                if (new_cell(row, column, r))
+                    return true;
             }
         }
         correct_board[row][column] = 0;
-        System.out.println("Backtracking");
         return false;
     }
 }
