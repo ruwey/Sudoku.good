@@ -11,7 +11,7 @@ public class Board {
      */
     public Board() {
         correct_board = new_board();
-        current_board =
+        current_board = correct_board;
     }
 
     public String toString() {
@@ -82,8 +82,20 @@ public class Board {
      * Removes values from a completed board to create an active one.
      * @param board the board to take from
      * @param difficulty amount of cells to remove
-     * @return amount of 
+     * @return a board that has a set amount of cell missing
      */
+    public int[][] remove(int[][] board, int difficulty) {
+        int[][] new_board = board;
+        int[] pos;
+        while (difficulty > 0) {
+            pos = new int[]{(int) (Math.random() * 9), (int) (Math.random())};
+            if (new_board[pos[0]][pos[1]] != 0) {
+                new_board[pos[0]][pos[1]] = 0;
+                difficulty--;
+            }
+        }
+        return new_board;
+    }
 
     // Checkers
     /**
