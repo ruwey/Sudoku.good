@@ -1,38 +1,46 @@
 import java.util.*;
 
 public class Board {
-    int[][] correct_board;
-    int[][] current_board;
+    private final int[][] correct_board;
+    private int[][] current_board;
+    private int[] pos;
 
-    // fuck my life
-    /* fuck my life: Part 2 - recursion
-       I need create a function that calls its self to generate every column but the middle, thus if my function fails
-       it can go back to the previous function and backtrack, good luck dumbass.
-     */
     public Board() {
         correct_board = new_board();
-        current_board = correct_board;
+        current_board = remove(correct_board, 2);
+        pos = new int[]{0, 0};
+    }
+    public Board(int diff) {
+        correct_board = new_board();
+        current_board = remove(correct_board, diff);
+        pos = new int[]{0, 0};
     }
 
     public String toString() {
         String output = "╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗\n";
         output += "║";
-        for (int cell = 0; cell < current_board.length; cell++) {
-            if (cell % 3 == 2)
-                output += " " + current_board[0][cell] + " ║";
-            else
-                output += " " + current_board[0][cell] + " │";
-        }
-        for (int col = 1; col < current_board.length; col++) {
-            if (col % 3 == 0)
-                output += "\n╠═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╣\n║";
-            else
-                output += "\n╟───┼───┼───╫───┼───┼───╫───┼───┼───╢\n║";
-            for (int cell = 0; cell < current_board.length; cell++) {
-                if (cell % 3 == 2)
-                    output += " " + current_board[col][cell] + " ║";
+        for (int row = 0; row < current_board.length; row++) {
+            if (row > 0) {
+                if (row % 3 == 0)
+                    output += "\n╠═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╣\n║";
                 else
-                    output += " " + current_board[col][cell] + " │";
+                    output += "\n╟───┼───┼───╫───┼───┼───╫───┼───┼───╢\n║";
+            }
+            for (int col = 0; col < current_board.length; col++) {
+                String prefix = "";
+                int mul = 1;
+                if (current_board[row][col] == 0) // if empty, make red
+                    prefix = "^Q";
+                else if (current_board[row][col] < 0) {
+                    prefix = "^H";
+                    mul = -1;
+                }
+                if (row == pos[0] && col == pos[1]) // if selected, flip colors
+                    prefix = "^g^W";
+                if (col % 3 == 2)
+                    output += " " + prefix + (current_board[row][col] * mul) + "^w^B ║";
+                else
+                    output += " " + prefix + (current_board[row][col] * mul) + "^w^B │";
             }
         }
         output += "\n╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝\n";
@@ -85,10 +93,12 @@ public class Board {
      * @return a board that has a set amount of cell missing
      */
     public int[][] remove(int[][] board, int difficulty) {
-        int[][] new_board = board;
+        int[][] new_board = new int[9][9];
+        for (int i = 0; i < board.length; i++)
+            new_board[i] = board[i].clone();
         int[] pos;
         while (difficulty > 0) {
-            pos = new int[]{(int) (Math.random() * 9), (int) (Math.random())};
+            pos = new int[]{(int) (Math.random() * 9), (int) (Math.random() * 9)};
             if (new_board[pos[0]][pos[1]] != 0) {
                 new_board[pos[0]][pos[1]] = 0;
                 difficulty--;
@@ -138,5 +148,49 @@ public class Board {
                 if (board[i][j] == num) //check if the current possible number conflicts
                     return false;
         return true;
+    }
+    /**
+     * Checks if the current_board is equal to the correct_board. Meant to be used to detect a win state in main method.
+     * @return true if the user has correctly completed the board, false otherwise
+     */
+    public boolean check_complete() {
+        for (int row = 0; row < current_board.length; row++)
+            for (int col = 0; col < current_board[row].length; col++)
+                if (current_board[row][col] <= 0) {
+                    if (current_board[row][col] * -1 != correct_board[row][col])
+                        return false;
+                }
+        return true;
+    }
+
+    // Code for interacting with the board
+    // Movement Code
+    /**
+     * Moves the user's selected cell, keeping the user in bounds
+     * @param col amount/direction of columns to move
+     * @param row amount/direction of rows to move
+     */
+    public void move(int col, int row) {
+        pos[0] += col;
+        pos[1] += row;
+        if (pos[0] > 8)
+            pos[0]--;
+        else if (pos[0] < 0)
+            pos[0]++;
+        if (pos[1] > 8)
+            pos[1]--;
+        else if (pos[1] < 0)
+            pos[1]++;
+    }
+    // Enter Values
+    /**
+     * Enters a user guess as to the value of the selected cell, does it negatively to distinguish between these and
+     * the cells set by the program
+     * @param val value to enter
+     */
+    public void enter(int val) {
+        if (current_board[pos[0]][pos[1]] <= 0) {
+            current_board[pos[0]][pos[1]] = val * -1;
+        }
     }
 }
