@@ -1,2 +1,2 @@
 # Sudoku.good
-Sudoku (thats good)
+Sudoku (that's good)
